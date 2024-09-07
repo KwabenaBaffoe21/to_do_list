@@ -8,12 +8,14 @@ class InputField extends StatefulWidget {
     this.maxLength,
     this.maxLines,
     this.icon,
+    required this.controller,
   });
 
   final String label;
   final int? maxLength;
   final int? maxLines;
   final IconData? icon;
+  final TextEditingController controller ;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -23,6 +25,7 @@ class _InputFieldState extends State<InputField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w300),
       cursorHeight: 25,
       maxLines: widget.maxLines ?? 1,

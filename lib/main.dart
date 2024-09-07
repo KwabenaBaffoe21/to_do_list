@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart';
-import 'package:to_do_list/screens/createtask.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:to_do_list/screens/home_screen.dart';
+import 'package:to_do_list/screens/welcome.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-import 'features/button.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const TaskApp());
 }
 
@@ -14,65 +17,29 @@ class TaskApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return  MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ToDo List',
-      home: Homepage(),
+      home:  FutureBuilder(
+        future: _checkFirstRun(),
+        builder: (context,snapshot){
+          if (snapshot.connectionState == ConnectionState.done){
+            bool isFirstRun = snapshot.data as bool;
+            return isFirstRun ? const Welcome() : const HomeScreen();
+          }else{
+            return const Center(child: CircularProgressIndicator());
+          }
+        }
+      ),
     );
   }
 }
 
-class Homepage extends StatelessWidget {
-  const Homepage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 2,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 23),
-          child: Text(
-            'todo list'.toUpperCase(),
-            style: GoogleFonts.courgette(fontSize: 32),
-          ),
-        ),
-        leadingWidth: 154,
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Center(
-            child: Image(
-              image: Svg('Images/NoTasks.svg'),
-              width: 350,
-              height: 300,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            'No Task Yet',
-            style: GoogleFonts.inter(
-              fontSize: 24,
-              fontWeight: FontWeight.w400,
-              color: const Color(0xff65558f),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 109.5),
-            child: Button(
-              text: 'New Task',
-              screen: CreateTask(),
-              icon: Icons.add,
-            ),
-          )
-        ],
-      ),
-    );
+Future<bool> _checkFirstRun() async{
+  final prefs = await SharedPreferences.getInstance();
+  bool isFirstRun = prefs.getBool('isFirstRun')?? true;
+  if(isFirstRun){
+    await prefs.setBool('isFirstRun', false);
   }
+  return isFirstRun;
 }
