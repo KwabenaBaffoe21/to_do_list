@@ -25,7 +25,7 @@ Before you can run this project, ensure you have the following:
 
 ### Step 1: Clone the repository
 ```bash
-[git clone] (https://github.com/your-username/todo_list_app.git)
+git clone https://github.com/your-username/todo_list_app.git
 cd todo_list_app
 ```
 ### Step 2: Install dependencies
