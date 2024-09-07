@@ -7,6 +7,7 @@ void addTask(
   }*/
   FirebaseFirestore.instance.collection('task').add({
     'taskName': taskName,
+    'taskName_lowercase': taskName.toLowerCase(),
     'description': description ?? '',
     'status': status,
     'createdAt': DateTime.now()

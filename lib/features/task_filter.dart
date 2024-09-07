@@ -1,12 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'filter_button.dart';
 
 class TaskFilter extends StatefulWidget {
-  const TaskFilter({
-    super.key,
-  });
+  final Function(String) onFilterChanged;
+
+  const TaskFilter({super.key, required this.onFilterChanged});
 
   @override
   State<TaskFilter> createState() => _TaskFilterState();
@@ -14,38 +13,12 @@ class TaskFilter extends StatefulWidget {
 
 class _TaskFilterState extends State<TaskFilter> {
   String selectedFilter = 'All';
-  late Future<List<DocumentSnapshot>> documentsFuture;
-
-  @override
-  void initState(){
-    super.initState();
-    documentsFuture=fetchDocuments();
-  }
-
-  Future<List<DocumentSnapshot>> fetchDocuments() async {
-    QuerySnapshot snapshot;
-
-    if (selectedFilter == 'All') {
-      snapshot=await FirebaseFirestore.instance.collection('task').get();
-    } else if (selectedFilter == 'Completed') {
-      snapshot = await FirebaseFirestore.instance
-          .collection('task')
-          .where('status', isEqualTo: 'completed')
-          .get();
-    } else{
-     snapshot= await FirebaseFirestore.instance
-          .collection('task')
-          .where('status', isEqualTo: 'pending')
-          .get();
-    }
-   return snapshot.docs;
-  }
 
   void onFilterSelected(String filter) {
-   setState(() {
-     selectedFilter = filter;
-     documentsFuture = fetchDocuments();
-   });
+    setState(() {
+      selectedFilter = filter;
+    });
+    widget.onFilterChanged(filter); // Notify parent about the filter change
   }
 
   @override
@@ -53,9 +26,7 @@ class _TaskFilterState extends State<TaskFilter> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(
-          width: 35,
-        ),
+        const SizedBox(width: 35),
         FilterButton(
           label: 'All',
           isSelected: selectedFilter == 'All',
@@ -66,7 +37,7 @@ class _TaskFilterState extends State<TaskFilter> {
           child: FilterButton(
             label: 'Completed',
             isSelected: selectedFilter == 'Completed',
-            onSelected: () => onFilterSelected('Completed')
+            onSelected: () => onFilterSelected('Completed'),
           ),
         ),
         FilterButton(
@@ -76,6 +47,5 @@ class _TaskFilterState extends State<TaskFilter> {
         ),
       ],
     );
-
   }
 }

@@ -27,7 +27,7 @@ class TaskApp extends StatelessWidget {
             bool isFirstRun = snapshot.data as bool;
             return isFirstRun ? const Welcome() : const HomeScreen();
           }else{
-            return const Center(child: CircularProgressIndicator());
+            return const HomeScreen();
           }
         }
       ),

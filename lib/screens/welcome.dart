@@ -3,7 +3,7 @@ import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../features/button.dart';
-import 'createtask.dart';
+import 'create_task.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -25,7 +25,7 @@ class Welcome extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-           const Center(
+          const Center(
             child: Image(
               image: Svg('Images/NoTasks.svg'),
               width: 350,
@@ -46,11 +46,18 @@ class Welcome extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 109.5),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 109.5),
             child: Button(
               text: 'New Task',
-              screen: CreateTask(),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreateTask(),
+                  ),
+                );
+              },
               icon: Icons.add,
             ),
           )
