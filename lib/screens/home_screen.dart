@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../features/task_filter.dart';
 import '../features/search_box.dart';
-import '../functions/task_item.dart';
+import '../features/task_item.dart';
 import 'create_task.dart';
 
 class HomeScreen extends StatefulWidget {
