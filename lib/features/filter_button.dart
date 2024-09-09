@@ -21,7 +21,7 @@ class FilterButton extends StatelessWidget {
         style: GoogleFonts.inter(
             color: const Color(0xffffffff),
             fontSize: 12,
-            fontWeight: FontWeight.w900),
+            fontWeight: FontWeight.w400),
       ),
       onSelected: (bool isSelected) {
         onSelected();

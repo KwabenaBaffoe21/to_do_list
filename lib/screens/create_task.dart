@@ -17,12 +17,12 @@ class _CreateTaskState extends State<CreateTask> {
   late TextEditingController taskNameController = TextEditingController();
   late TextEditingController descriptionController = TextEditingController();
 
-  /* @override
+   @override
   void initState() {
     super.initState();
     taskNameController = TextEditingController();
     descriptionController = TextEditingController();
-  }*/
+  }
 
   @override
   void dispose() {

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.doc});
 
-  final QueryDocumentSnapshot doc;
+  final DocumentSnapshot doc;
 
   @override
   State<TaskItem> createState() => _TaskItemState();
@@ -18,6 +18,7 @@ class _TaskItemState extends State<TaskItem> {
   @override
   void initState() {
     super.initState();
+    // Check status based on document field
     isChecked = widget.doc['status'] == 'completed';
   }
 
@@ -26,19 +27,21 @@ class _TaskItemState extends State<TaskItem> {
     Timestamp timeStamp = widget.doc['createdAt'];
     DateTime dateTime = timeStamp.toDate();
     String createdAt = DateFormat('HH:mm').format(dateTime);
+
     return ListTile(
       leading: Checkbox(
-          value: isChecked,
-          onChanged: (bool? value) {
-            setState(() {
-              isChecked = value!;
-              String newStatus = isChecked ? 'completed' : 'pending';
-              FirebaseFirestore.instance
-                  .collection('task')
-                  .doc(widget.doc.id)
-                  .update({'status': newStatus});
-            });
-          }),
+        value: isChecked,
+        onChanged: (bool? value) {
+          setState(() {
+            isChecked = value!;
+            String newStatus = isChecked ? 'completed' : 'pending';
+            FirebaseFirestore.instance
+                .collection('task')
+                .doc(widget.doc.id)
+                .update({'status': newStatus});
+          });
+        },
+      ),
       title: Text(
         widget.doc['taskName'],
         style: GoogleFonts.inter(
@@ -58,44 +61,41 @@ class _TaskItemState extends State<TaskItem> {
             child: IconButton(
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        actionsAlignment: MainAxisAlignment.spaceEvenly,
-                        actionsPadding: const EdgeInsets.all(20),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              FirebaseFirestore.instance
-                                  .collection('task')
-                                  .doc(widget.doc.id)
-                                  .delete();
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(color: Colors.red, fontSize: 25),
-                            ),
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      actionsAlignment: MainAxisAlignment.spaceEvenly,
+                      actionsPadding: const EdgeInsets.all(20),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            FirebaseFirestore.instance
+                                .collection('task')
+                                .doc(widget.doc.id)
+                                .delete();
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red, fontSize: 25),
                           ),
-                          const TextButton(
-                            onPressed: null,
-                            child: Text(
-                              'Edit',
-                              style: TextStyle(fontSize: 25),
-                            ),
+                        ),
+                        const TextButton(
+                          onPressed: null,
+                          child: Text(
+                            'Edit',
+                            style: TextStyle(fontSize: 25),
                           ),
-                        ],
-                      );
-                    });
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
-              icon: const Icon(
-                Icons.more_vert_rounded,
-              ),
+              icon: const Icon(Icons.more_vert_rounded),
             ),
           ),
-          Text(
-            createdAt,
-          ),
+          Text(createdAt),
         ],
       ),
     );

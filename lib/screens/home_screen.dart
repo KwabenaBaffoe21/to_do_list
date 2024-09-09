@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String selectedFilter = 'All';
-  String searchQuery = '';
 
   void onFilterChanged(String filter) {
     setState(() {
@@ -25,31 +24,17 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void onSearchChanged(String query) {
-    setState(() {
-      searchQuery = query.toLowerCase();
-    });
-  }
-
   // Method to return a Firestore stream based on the selected filter
   Stream<QuerySnapshot<Map<String, dynamic>>> getTaskStream() {
     final taskCollection = FirebaseFirestore.instance.collection('task');
 
-    Query<Map<String, dynamic>> query = taskCollection;
-
-    if (selectedFilter == 'Completed') {
-      query = query.where('status', isEqualTo: 'completed');
-    } else if (selectedFilter == 'Incomplete') {
-      query = query.where('status', isEqualTo: 'pending');
+    if (selectedFilter == 'All') {
+      return taskCollection.snapshots();
+    } else if (selectedFilter == 'Completed') {
+      return taskCollection.where('status', isEqualTo: 'completed').snapshots();
+    } else {
+      return taskCollection.where('status', isEqualTo: 'pending').snapshots();
     }
-
-    if (searchQuery.isNotEmpty) {
-      query = query
-          .where('title', isGreaterThanOrEqualTo: searchQuery)
-          .where('title', isLessThanOrEqualTo: '$searchQuery\uf8ff');
-    }
-
-    return query.snapshots();
   }
 
   @override
@@ -68,19 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 23.0),
-            child: SearchBox(
-              onSearchChanged: onSearchChanged,
-            ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 23.0),
+            child: SearchBox(),
           ),
           TaskFilter(
             onFilterChanged: onFilterChanged, // Pass filter change callback
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: getTaskStream(),
-              // Use the dynamic query based on the filter
+              stream: getTaskStream(), // Use the dynamic query based on the filter
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -97,11 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          "Finally, We're done 🥳",
+                          'No New Task',
                           style: GoogleFonts.inter(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff65558f)),
+                            fontSize: 24,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xff65558f)
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],

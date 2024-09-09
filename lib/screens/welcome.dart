@@ -12,12 +12,12 @@ class Welcome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 2,
         leading: Padding(
           padding: const EdgeInsets.only(left: 23),
           child: Text(
             'todo list'.toUpperCase(),
-            style: GoogleFonts.courgette(fontSize: 32),
+            style: GoogleFonts.courgette(
+                fontSize: 32, fontWeight: FontWeight.normal),
           ),
         ),
         leadingWidth: 154,
