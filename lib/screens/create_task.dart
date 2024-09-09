@@ -89,7 +89,7 @@ class _CreateTaskState extends State<CreateTask> {
                           //textAlign: TextAlign.center,
                         ),
                       ),
-                      duration: const Duration(microseconds: 5),
+                      duration: const Duration(microseconds: 500),
                       backgroundColor: const Color(0xa6655587),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(80),
