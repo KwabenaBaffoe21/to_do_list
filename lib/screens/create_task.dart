@@ -40,7 +40,7 @@ class _CreateTaskState extends State<CreateTask> {
           icon: const Icon(
             Icons.arrow_back,
             color: Color(
-              0xff000000,
+              0xff65558f,
             ),
           ),
         ),

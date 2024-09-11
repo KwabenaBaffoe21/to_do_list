@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:to_do_list/functions/get_task_id.dart';
+
+import '../screens/edit_page.dart';
 
 class TaskItem extends StatefulWidget {
   const TaskItem({super.key, required this.doc});
@@ -80,9 +83,21 @@ class _TaskItemState extends State<TaskItem> {
                             style: TextStyle(color: Colors.red, fontSize: 25),
                           ),
                         ),
-                        const TextButton(
-                          onPressed: null,
-                          child: Text(
+                        TextButton(
+                          onPressed: () async {
+                            String? taskID =
+                                await getTaskID(widget.doc['taskName'] ?? '');
+                            if (!mounted) return;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditPage(
+                                  taskID: taskID,
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text(
                             'Edit',
                             style: TextStyle(fontSize: 25),
                           ),

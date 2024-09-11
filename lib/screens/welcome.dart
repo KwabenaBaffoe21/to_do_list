@@ -37,7 +37,7 @@ class Welcome extends StatelessWidget {
           ),
           Text(
             'No Task Yet',
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 24,
               fontWeight: FontWeight.w400,
               color: const Color(0xff65558f),

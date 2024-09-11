@@ -23,11 +23,11 @@ class _SearchBoxState extends State<SearchBox> {
       ),
       readOnly: true,
       cursorHeight: 25,
-      style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w400),
+      style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w400),
       decoration: InputDecoration(
         hintText: 'Search',
         hintStyle:
-            GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.normal),
+            GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.normal),
         prefixIcon: const Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(99),

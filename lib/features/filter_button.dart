@@ -20,7 +20,7 @@ class FilterButton extends StatelessWidget {
         label,
         style: GoogleFonts.inter(
             color: const Color(0xffffffff),
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.w400),
       ),
       onSelected: (bool isSelected) {

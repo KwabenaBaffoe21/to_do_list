@@ -46,7 +46,7 @@ class _ButtonState extends State<Button> {
           ],
           Text(
             widget.text,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w400,
               color: const Color(0xffffffff),

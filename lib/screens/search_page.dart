@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -14,41 +15,63 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   late TextEditingController searchController;
-  String searchQuery = '';
+  List allResults = [];
+  List resultList = [];
 
   @override
   void initState() {
     super.initState();
     searchController = TextEditingController();
+    searchController.addListener(onSearchChanged);
+  }
+
+  onSearchChanged() {
+    print(searchController.text);
+    searchResultList();
   }
 
   @override
   void dispose() {
     super.dispose();
     searchController.dispose();
+    searchController.removeListener(onSearchChanged);
   }
 
-  void onSearchChanged(String query) {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    getClientStream();
+  }
+
+  searchResultList() {
+    var showResults = [];
+    if (searchController.text.isNotEmpty) {
+      for (var taskSnapshot in allResults) {
+        var name = taskSnapshot['taskName'].toString().toLowerCase();
+        if (name.contains(
+          searchController.text.toLowerCase(),
+        )) {
+          showResults.add(taskSnapshot);
+        }
+      }
+    } else {
+      showResults = List.from(allResults);
+    }
     setState(() {
-      searchQuery = query.toLowerCase();
+      resultList = showResults;
     });
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>? getTaskStream() {
-    final taskCollection = FirebaseFirestore.instance.collection('task');
+  getClientStream() async {
+    var data = await FirebaseFirestore.instance
+        .collection('task')
+        .orderBy('taskName_lowercase')
+        .get();
 
-    if(searchQuery.isEmpty){
-      return null;
-    }
-
-    Query<Map<String, dynamic>> query = taskCollection;
-
-    if (searchQuery.isNotEmpty) {
-      query = query
-          .where('title_lowercase', isGreaterThanOrEqualTo: searchQuery)
-          .where('title_lowercase', isLessThanOrEqualTo: '$searchQuery\uf8ff');
-    }
-    return query.snapshots();
+    setState(() {
+      allResults = data.docs;
+    });
+    searchResultList();
   }
 
   @override
@@ -69,90 +92,35 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 23.0),
-            child: TextField(
+            child: CupertinoSearchTextField(
               controller: searchController,
-              onChanged: onSearchChanged,
-              cursorHeight: 25,
-              style:
-                  GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w400),
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Search',
-                hintStyle: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                  color: const Color(0xff655587),
-                ),
-                suffixIcon: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-                suffixIconColor: const Color(0xff65558f),
-                border: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                    color: Color(0xff65558f),
-                  ),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(99),
-                  borderSide: const BorderSide(
-                    color: Color(0xff65558f),
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-              ),
             ),
           ),
           Expanded(
-            child: StreamBuilder(
-                stream: getTaskStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Task doesn't exist",
-                          style: GoogleFonts.inter(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff65558f),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  return ListView.separated(
-                      padding: EdgeInsets.fromLTRB(16, 14, 16, 0),
-                      itemBuilder: (context, index) {
-                        final doc = snapshot.data!.docs[index];
-                        Timestamp timeStamp = doc['createdAt'];
-                        DateTime dateTime = timeStamp.toDate();
-                        String createdAt = DateFormat('HH:mm').format(dateTime);
-                        return ListTile(
-                          title: Text(
-                            doc['taskName'],
-                            style: GoogleFonts.inter(),
-                          ),
-                          subtitle: Text(
-                            doc['description'],
-                            style: GoogleFonts.inter(),
-                          ),
-                          trailing: Text(
-                            createdAt,
-                            style: GoogleFonts.inter(),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: snapshot.data!.docs.length);
-                }),
+            child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                itemBuilder: (context, index) {
+                  final doc = resultList[index];
+                  Timestamp timeStamp = doc['createdAt'];
+                  DateTime dateTime = timeStamp.toDate();
+                  String createdAt = DateFormat('HH:mm').format(dateTime);
+                  return ListTile(
+                    title: Text(
+                      doc['taskName'],
+                      style: GoogleFonts.poppins(),
+                    ),
+                    subtitle: Text(
+                      doc['description'],
+                      style: GoogleFonts.poppins(),
+                    ),
+                    trailing: Text(
+                      createdAt,
+                      style: GoogleFonts.poppins(),
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) => const Divider(),
+                itemCount: resultList.length),
           ),
         ],
       ),
